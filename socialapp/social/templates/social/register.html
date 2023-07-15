@@ -1,0 +1,38 @@
+{% extends 'social/base.html' %}
+{% load widget_tweaks %} 
+{%block content%}
+    <div class="container" style="width:50% ;" >
+        <h2 class="lead" align="center"><u>New Registration</u></h2> <br>
+        <form action="" method="POST">
+            {%csrf_token%}
+            {% for field in form.visible_fields %}  
+            <div class="form-group">  
+              <label for="{{ field.id_for_label }}">{{ field.label }}:</label>  
+              {% render_field field class="form-control"%}
+              {% for error in field.errors %}  
+                <span class="help-block" style="color: red;">{{ error }}</span>  
+              {% endfor %}  
+            </div>  
+          {% endfor %}   <br>
+          <!-- <input type="date" id="txtDate"> -->
+          <button type="submit" class="btn btn-secondary" style="width: 100%;">Register</button>
+        </form>
+    <div>
+      <script>
+        $(function(){
+          var dtToday = new Date();
+          var month = dtToday.getMonth()+1;
+          var day = dtToday.getDate();
+          var year = dtToday.getFullYear();
+          if (month < 10){
+            month = '0' + month.toString();
+          }
+          if(day<10){
+            day = '0' + day.toString();
+          }
+          var maxDate = year + '-' + month + '-' + day;
+          console.log(maxDate)
+          $('#txtDate').attr('max',maxDate);
+        });
+      </script>
+{%endblock%}

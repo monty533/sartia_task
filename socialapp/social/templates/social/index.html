@@ -1,0 +1,245 @@
+{% extends 'social/base.html' %}
+{%load static%}
+{%block content%}
+    <style> 
+        .chat-online {
+            color: #34ce57
+        }
+
+        .chat-offline {
+            color: #e4606d
+        }
+
+        .chat-message-left,
+        .chat-message-right {
+            display: flex;
+            flex-shrink: 0
+        }
+
+        .chat-message-left {
+            margin-right: auto
+        }
+
+        .chat-message-right {
+            flex-direction: row-reverse;
+            margin-left: auto
+        }
+        .py-3 {
+            padding-top: 1rem!important;
+            padding-bottom: 1rem!important;
+        }
+        .px-4 {
+            padding-right: 1.5rem!important;
+            padding-left: 1.5rem!important;
+        }
+        .flex-grow-0 {
+            flex-grow: 0!important;
+        }
+        .border-top {
+          
+            border-top: 1px solid #dee2e6!important;
+        }
+        .card{border:1px solid #e0e0e0 ; border-radius: 20px;padding: 13px;}
+        .chat-messages{height: 350px;overflow-y: auto;}
+        .well{
+            height: 50px;
+            /* padding: 5px; */
+            background-color: lightslategray;
+            color: white;
+            border-radius: 20px;
+            padding-top: 10px;
+        }
+      
+    </style>
+
+    <main class="content">
+        <div class="container p-0">
+    
+            <!-- <button class="mt-4 mb-3 ml-3 btn btn-secondary btn-sm"><a href="">Go Back</a></button> -->
+            <h1 class="lead">Make a Chat</h1>
+            <div class="row well well-lg">
+                <p>You ({{request.user.name}})</p>
+            </div>
+            <div class="card">
+                <div class="row">
+                   
+                    <div class="col-12 col-lg-5 col-xl-3 border-right" style="border-right:1px solid lightgrey ;">
+    
+                        <div class="px-4 d-none d-md-block">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <input type="text" class="form-control my-3" placeholder="Search..." id="searchDir">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="people-list">
+                            
+                            <hr class="d-block d-lg-none mt-1 mb-0">
+
+
+                            {%for f in users%}
+                            <a href="/chat/{{f.pk}}/{{f.name}}" {% if f.pk == friend.pk  %} style="background-color: lightblue;" {%endif%} class="chatusers list-group-item list-group-item-action border-0">
+                                <div class="badge bg-success float-right"></div>
+                                <div class="d-flex align-items-start">
+                                    {% if f.gender == 'male' %}
+                                    <img src="{% static 'images/avatar.png'%}" class="rounded-circle mr-1" alt="Vanessa Tucker" width="50" height="50">
+                                    {%else%}
+                                    <img src="{% static 'images/avatar1.png'%}" class="rounded-circle mr-1" alt="Vanessa Tucker" width="50" height="50">
+                                    {%endif%}
+                                    <div class="flex-grow-1 ml-3">
+                                        {{f.name}}
+                                       
+                                        <div class="small">
+                                            <span class="fas fa-circle chat-online"  style="font-size:10px;"></span>
+                                            {{f.gender|title}} - {{f.dob}} <br> {{f.contact_no}}
+                                        
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </a>
+                            <hr>
+                            {%endfor%}
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-7 col-xl-9">
+                        {% if friend %}
+                        <div class="py-2 px-4 border-bottom d-none d-lg-block">
+                            <div class="d-flex align-items-center py-1">
+                                <div class="position-relative">
+                                    <img src="{% static 'images/avatar.png'%}" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">
+                                </div>
+                                <div class="flex-grow-1 pl-3">
+                                    <strong>&nbsp;{{friend.name}}</strong> <br>
+                                    <small>&nbsp;{{friend.gender|title}}</small>
+                                    <!-- <p>Start a Chat</p> -->
+                                </div>
+                               
+                            </div>
+                        </div>
+    
+                        <div class="chatlog">
+                            <div class="chat-messages p-4">
+                                {% if chats%}
+                                {%for chat in chats %}
+                                {%if chat.sender_id == request.user %}
+                                <div class="chat-message-right pb-4">
+                                    <div>
+                                        <!-- <img src="{{chat.user.image.url}}" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"> -->
+                                        <div class="text-muted small text-nowrap mt-2">{{chat.timestamp | time}}</div>
+                                    </div>
+                                    <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                                        <div class="font-weight-bold mb-1">You</div>
+                                        {{chat.msg}}
+                                    </div>
+                                </div>
+                                {%else%}
+                                <div class="chat-message-left pb-4">
+                                    <div>
+                                        <!-- <img src="{{chat.user.image.url}}" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"> -->
+                                        <div class="text-muted small text-nowrap mt-2">{{chat.timestamp | time}}</div>
+                                    </div>
+                                    <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+                                        <div class="font-weight-bold mb-1">{{chat.rec_id.name}}</div>
+                                        {{chat.msg}}
+                                    </div>
+                                </div>
+                                {%endif%}
+                                {%endfor%}
+                                {%else%}
+                                    <p id='no_msg'>No messages here</p>
+                                {%endif%}
+                            </div>
+                        </div>
+                        <div class="flex-grow-0 py-3 px-4 border-top">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="chat-message-input" placeholder="Type your message">
+                                <button class="btn btn-primary" id="chat-message-submit">Send</button>
+                            </div>
+                        </div>
+                        {%else%}
+                            
+                            <h6 class="display-6" style="margin-top:200px" align="center">Click on the Left side to start a chat. &larr;</h6>
+                        {%endif%}
+                        
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {{friend.id | json_script:'friend' }}
+    {{request.user.id  | json_script:'user_id'}}
+    
+    <!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
+    <script>
+        chatLog=document.querySelector('.chat-messages')
+       	let friend=JSON.parse(document.getElementById('friend').textContent);
+        console.log(friend)
+        if (friend){
+            const ChatSocket= new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/chat/'
+                + friend
+                + '/'
+            )
+            ChatSocket.onopen= function(e){
+                console.log('Chat socket connected')
+            };
+
+            ChatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly',e);
+            };
+
+
+            ChatSocket.onmessage=function(e){
+                data=JSON.parse(e.data)
+                const messageElement = document.createElement('div')
+                const userId = data['user_id']
+                const loggedInUserId = JSON.parse(document.getElementById('user_id').textContent)
+                let today = new Date();
+                let time = today.getHours() + ":" + today.getMinutes() ;
+                
+                if (userId === loggedInUserId) {
+                    chatLog.innerHTML += '<div class="chat-message-right pb-4"><div><div class="text-muted small text-nowrap mt-2">'+ time  +'</div></div><div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"><div class="font-weight-bold mb-1">You</div>'+data.message+'</div></div>';
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                    document.querySelector('#no_msg').innerHTML= '';
+                    
+                } else {
+                    chatLog.innerHTML += '<div class="chat-message-left pb-4"><div><div class="text-muted small text-nowrap mt-2">'+ time +'</div></div><div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"><div class="font-weight-bold mb-1">'+ data.name +'</div>'+data.message+'</div></div>';
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                    document.querySelector('#no_msg').innerHTML= '';
+                }
+        
+            };
+            
+            document.querySelector('#chat-message-input').focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                    document.querySelector('#chat-message-submit').click();
+                }
+            };
+
+            document.querySelector('#chat-message-submit').onclick = function(e) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                if (!message){
+                    alert("message can't be blank.")
+                    return;
+                }
+                ChatSocket.send(JSON.stringify({
+                    'message': message,
+                    'rec_id' : friend
+                }));
+                messageInputDom.value = '';
+            };
+
+            element=document.getElementsByTagName("body")[0];
+            element.onload = function() {
+                chatLog.scrollTop = chatLog.scrollHeight;
+            };
+        }
+    </script>
+    
+    {%endblock%}
